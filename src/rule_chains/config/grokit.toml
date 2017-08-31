@@ -1,0 +1,163 @@
+# checks perform the actual execution of the comparison or match
+[blocks]
+    [blocks.tcp_v4_check]
+    name = "tcp_v4_check"
+    frontend_rule = "PFSENSE_IP_RULE_V4"
+    ctype = "lambda"
+    cvalue = "lambda state, res: res is not None and res.get('ip_proto', '') == '6'"
+    return_results = true
+
+    [blocks.tcp_v6_check]
+    name = "tcp_v6_check"
+    frontend_rule = "PFSENSE_IP_RULE_V6"
+    ctype = "lambda"
+    cvalue = "lambda state, res: res is not None and res.get('ip_proto', '') == '6'"
+    return_results = true
+
+    [blocks.udp_v4_check]
+    name = "udp_v4_check"
+    frontend_rule = "PFSENSE_IP_RULE_V4"
+    ctype = "static_list"
+    cvalue = [["ip_proto", "17"]]
+    return_results = true
+
+    [blocks.udp_v6_check]
+    name = "udp_v6_check"
+    frontend_rule = "PFSENSE_IP_RULE_V6"
+    ctype = "static_list"
+    cvalue = [["ip_proto", "17"]]
+    return_results = true
+
+    [blocks.ip_v4_check]
+    name = "ip_v4_check"
+    frontend_rule = "PFSENSE_IP_RULE_V4"
+    ctype = "static_list"
+    cvalue = [["ip_version", "4"]]
+    return_results = true
+
+    [blocks.ip_v6_check]
+    name = "ip_v6_check"
+    frontend_rule = "PFSENSE_IP_RULE_V6"
+    ctype = "static_list"
+    cvalue = [["ip_proto", "17"]]
+    return_results = true
+
+    [blocks.syslog_program_check]
+    name = "syslog_program_check"
+    frontend_rule = "SYSLOG_PRE_MSG"
+    ctype = "lambda"
+    cvalue = "lambda state, res: res is not None and len(res.get('program', ''))"
+    return_results = true
+
+[chain_tables]
+    [chain_tables.syslog_dispatcher]
+    name = "syslog_app_dispatch"
+    perform_checks = ['all']
+    dispatch_table = [["filterlog", "filterlog"],
+                    ["openvpn", "openvpn"]]
+
+    extract_rule = "SYSLOG_PRE_MSG"
+    extract_type = "lambda"
+    extract_value = "lambda state, res: res.get('program', '') if isinstance(res, dict) else None"
+
+    all = ['syslog_program_check']
+
+[chains]
+    [chains.check_tcp]
+    name = "check_tcp"
+    # can be "any", "all", "blocks", "none"
+    # natural order is order of execution
+    any = ["tcp_v4_check", "tcp_v6_check"]
+    # which checks to perform and what order
+    perform_blocks = ["any"]
+
+    [chains.check_udp]
+    name = "check_tcp"
+    any = ["udp_v4_check", "udp_v6_check"]
+    perform_blocks = ["any"]
+
+    [chains.check_ip]
+    name = "check_ip"
+    any = ["ip_v4_check", "ip_v6_check"]
+    perform_blocks = ["any"]
+
+
+[chain_definition]
+    [chain_definition.filterlog]
+    name = "filterlog_chain"
+    order = ["check_tcp", "check_udp", "check_ip"]
+
+    [chain_definition.filterlog.chains.check_tcp]
+    name = "check_tcp"
+    # can be "any", "all", "checks", "none"
+    # natural order is order of execution
+    any = ["tcp_v4_check", "tcp_v6_check"]
+    # which checks to perform and what order
+    perform_checks = ["any"]
+
+    [chain_definition.filterlog.chains.check_udp]
+    name = "check_tcp"
+    any = ["udp_v4_check", "udp_v6_check"]
+    perform_checks = ["any"]
+
+    [chain_definition.filterlog.chains.check_ip]
+    name = "check_ip"
+    any = ["ip_v4_check", "ip_v6_check"]
+    perform_checks = ["any"]
+
+
+[groups]
+other = ["SYSLOG_PRE"]
+
+openvpn = [
+    "OPENVPN_MGMT_CONN",
+    "OPENVPN_MGMT_STAT2",
+    "OPENVPN_MGMT_QUIT",
+    "OPENVPN_MGMT_DISCONN",
+    "OPENVPN_SENT_CONTROL",
+    "OPENVPN_CONNECTION_INIT",
+    "OPENVPN_DATA_CHANNEL_ENCRYPT_CIPHER",
+    "OPENVPN_DATA_CHANNEL_ENCRYPT_HMAC",
+    "OPENVPN_DATA_CHANNEL_DECRYPT_CIPHER",
+    "OPENVPN_DATA_CHANNEL_DECRYPT_HMAC",
+    "OPENVPN_CONTROL_CHANNEL_CIPHER_SPEC",
+    "OPENVPN_MULTI_LEARN",
+    "OPENVPN_MULTI_SVA",
+    "OPENVPN_TLS_INITIAL_CONNECT",
+    "OPENVPN_TLS_AUTH_SUCCESS",
+    "OPENVPN_USER_AUTHN_SUCCESS",
+    "OPENVPN_USER_AUTHN_FAILED"
+]
+
+filterlog = [
+    "PFSENSE_BASE_RULE_V6",
+    "PFSENSE_IP_RULE_V6",
+    "PFSENSE_TCP_RULE_V6",
+    "PFSENSE_UDP_RULE_V6",
+    "PFSENSE_CARP_RULE_V6",
+    "PFSENSE_ICMP_ECHO_REQ_RULE_V6",
+    "PFSENSE_ICMP_ECHO_REP_RULE_V6",
+    "PFSENSE_ICMP_UNREACHABLE_PROTO_RULE_V6",
+    "PFSENSE_ICMP_UNREACHABLE_PORT_RULE_V6",
+    "PFSENSE_ICMP_NEED_FRAG_RULE_V6",
+    "PFSENSE_ICMP_TIMESTAMP_REQ_RULE_V6",
+    "PFSENSE_ICMP_TIMESTAMP_REP_RULE_V6",
+    "PFSENSE_ICMP_OTHER_RULE_V6",
+    "PFSENSE_ICMP_UNREACH_RULE_V6",
+    "PFSENSE_ICMP_UNKNOWN_RULE_V6",
+    "PFSENSE_BASE_RULE_V4",
+    "PFSENSE_IP_RULE_V4",
+    "PFSENSE_TCP_RULE_V4",
+    "PFSENSE_UDP_RULE_V4",
+    "PFSENSE_CARP_RULE_V4",
+    "PFSENSE_ICMP_ECHO_REQ_RULE_V4",
+    "PFSENSE_ICMP_ECHO_REP_RULE_V4",
+    "PFSENSE_ICMP_UNREACHABLE_PROTO_RULE_V4",
+    "PFSENSE_ICMP_UNREACHABLE_PORT_RULE_V4",
+    "PFSENSE_ICMP_NEED_FRAG_RULE_V4",
+    "PFSENSE_ICMP_TIMESTAMP_REQ_RULE_V4",
+    "PFSENSE_ICMP_TIMESTAMP_REP_RULE_V4",
+    "PFSENSE_ICMP_OTHER_RULE_V4",
+    "PFSENSE_ICMP_UNREACH_RULE_V4",
+    "PFSENSE_ICMP_UNKNOWN_RULE_V4"
+]

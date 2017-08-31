@@ -1,0 +1,7 @@
+*.pyc
+ignore
+.*egg-info.*
+build*
+dist*
+./src/.*egg-info.*
+src/rule_chains.egg-info
