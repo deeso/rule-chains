@@ -15,11 +15,16 @@ class Chain(object):
 
         self.name = name
         self.perform_blocks = perform_blocks
-        self.frontend = frontend
+        self.frontend = None
         self.blocks = blocks
         self.all_blocks = all_blocks
         self.any_blocks = any_blocks
         self.none_blocks = none_blocks
+
+    def update_frontend(self, frontend):
+        self.frontend = frontend
+        for block in self.blocks.values():
+            block.update_frontend(frontend)
 
     def serialize(self):
         results = {
@@ -77,8 +82,7 @@ class Chain(object):
             block_result = self.execute_block(c, string, state, save_key)
             block_results[c] = block_result
             br = block_result
-            if br.doret or br.exit_on_fail or \
-               isinstance(br.block_result, bool) and br.block_result:
+            if br.outcome:
                 return c, block_results
         return c, block_results
 
@@ -93,7 +97,7 @@ class Chain(object):
                 return c, block_results
         return c, block_results
 
-    def execute_chain(self, string, state={}):
+    def execute_chain(self, string, state={}, base_save_key=''):
         last_block = None
         block_result = None
         outcome = False
@@ -101,7 +105,7 @@ class Chain(object):
         exit = False
         rvalue = None
         block_results = {'last_block': '', 'last_chain': ''}
-        blocks_order = [i for i in self.blocks_order]
+        blocks_order = [i for i in self.perform_blocks]
         if len(blocks_order) == 0:
             blocks_order = ['blocks']
 
@@ -109,22 +113,22 @@ class Chain(object):
             executed = False
             if chain == 'blocks' and len(self.blocks) > 0:
                 executed = True
-                last_block, block_results = self.run_blocks(string, state)
+                last_block, block_results = self.run_blocks(string, state, base_save_key)
                 block_results['last_block'] = last_block
                 block_results['last_chain'] = chain
             elif chain == 'all' and len(self.all_blocks) > 0:
                 executed = True
-                last_block, block_results = self.run_all_blocks(string, state)
+                last_block, block_results = self.run_all_blocks(string, state, base_save_key)
                 block_results['last_block'] = last_block
                 block_results['last_chain'] = chain
             elif chain == 'any' and len(self.any_blocks) > 0:
                 executed = True
-                last_block, block_results = self.run_all_blocks(string, state)
+                last_block, block_results = self.run_any_blocks(string, state, base_save_key)
                 block_results['last_chain'] = chain
                 block_results['last_block'] = last_block
             elif chain == 'none' and len(self.none_blocks) > 0:
                 executed = True
-                last_block, block_results = self.run_none_blocks(string, state)
+                last_block, block_results = self.run_none_blocks(string, state, base_save_key)
                 block_results['last_chain'] = chain
                 block_results['last_block'] = last_block
             # in each of the check chains here is what the values mean
@@ -137,8 +141,8 @@ class Chain(object):
                 block_result = block_results[last_block]
                 outcome = block_result.outcome
                 doret = block_result.doret
-                exit = block_result.exit_on_fail
-                rvalue = block_result.block_result
+                exit = block_result.exit
+                rvalue = block_result.block_fn_result
                 if doret or exit:
                     break
         if block_results['last_chain'] == '':

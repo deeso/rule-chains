@@ -19,3 +19,11 @@ print(gr.match_pattern(udp_pattern, msg))
 
 # try all the patterns of interest
 print(gr.match_any_pattern(msg))
+
+# get the check_ip chain
+check_ip = gr.chains['check_ip']
+chain_result = check_ip.execute_chain(msg)
+
+# print the results from the block that return
+print(chain_result.block_result.frontend_rule)
+print(chain_result.block_result.return_value)

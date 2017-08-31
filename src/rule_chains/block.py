@@ -9,7 +9,7 @@ class BlockResult(object):
         self.name = name
         self.block_fn_result = block_fn_result
         self.doret = doret
-        self.exit = exit
+        self.exit = exit_on_fail
         self.state = state
         self.save_value = save_value
         self.frontend_results = frontend_results
@@ -27,12 +27,12 @@ class Block(object):
     PARAMETERIZED_LAMBDA = "lambda state, res: res is not None and all([])"
 
     def __init__(self, name, frontend_rule, ctype, cvalue,
-                 return_something=False, exit_on_fail=False, frontend=None,
+                 return_something=False, exit_on_fail=False, 
                  return_rule=None, return_results=False, return_value=None):
 
-        self.frontend = frontend
+        self.frontend = None
         self.name = name
-        self.init_rule = frontend_rule
+        self.frontend_rule = frontend_rule
         self.ctype = ctype
         self.raw_value = cvalue
         self.set__values = False
@@ -54,10 +54,13 @@ class Block(object):
             return_rule is not None or \
             return_results
 
+    def update_frontend(self, frontend):
+        self.frontend = frontend
+
     def serialize(self):
         results = {
             'name': self.name,
-            'init_rule': self.init_rule,
+            'frontend_rule': self.frontend_rule,
             'type': self.ctype,
             'value': self.raw_value,
         }
@@ -87,6 +90,8 @@ class Block(object):
         save_value = {}
         state['self'] = self
         br = BlockResult(self.name)
+        frontend = frontend if frontend is not None else self.frontend
+
         if 'frontend' not in state:
             state['frontend'] = frontend
 
@@ -98,7 +103,11 @@ class Block(object):
         br.frontend_results = results
         br.frontend_rule = self.frontend_rule
 
-        block_result = self.block_fn(state, results)
+        block_result = None
+        if results is not None and len(results) > 0:
+            block_result = self.block_fn(state, results)
+            # print block_result           
+
         br.outcome = block_result if isinstance(block_result, bool) \
             else block_result is not None
 

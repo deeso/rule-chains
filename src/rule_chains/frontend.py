@@ -139,8 +139,16 @@ class GrokFrontend(BaseFrontend):
                     self.fail(msg)
                 self.grok_groups[name].append(pattern_name)
 
+    def add_chains(self, chain_objs={}):
+        for name, chain in chain_objs.items():
+            # chain.update_frontend(self)
+            self.chains[name] = chain
+
+
+
     def add_blocks(self, block_objs):
         for name, block in block_objs.items():
+            block.update_frontend(self)
             self.blocks[name] = block
 
     def add_chain_dispatch_tables(self, dispatch_tables):

@@ -36,6 +36,7 @@ class ParseRuleChainsConfig(object):
             frontend.add_groups(groups_data)
             frontend.add_blocks(block_objs)
             frontend.add_chain_dispatch_tables(cdts)
+            frontend.add_chains(chains_objs)
 
         return {'blocks': block_objs, 'chains': chains_objs,
                 'chain_defs': chain_defs_objs, 'groups': groups_data,
