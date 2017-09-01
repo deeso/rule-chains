@@ -2,12 +2,12 @@ class ChainDispatchResult(object):
     def __init__(self, table_name, chain_name=None, success=False,
                  chain_result=None,
                  block_results=None, chain_results=None, rvalue=None,
-                 fe_results=None, chain=None, outcome=False,
+                 rule_results=None, chain=None, outcome=False,
                  extraction_value=None, last_block=None):
 
         self.chain = chain
         self.table_name = table_name
-        self.fe_results = fe_results
+        self.rule_results = rule_results
         self.extraction_value = extraction_value
         self.chain_name = chain_name
         self.chain_outcome = outcome
@@ -16,6 +16,19 @@ class ChainDispatchResult(object):
         self.block_results = block_results
         self.chain_result = chain_result
         self.outcome = outcome
+
+    def get_chain_result(self):
+        return self.chain_result
+
+    def get_rule_result(self):
+        if self.chain_result is not None:
+            return self.chain_result.get_rule_result()
+        return None
+
+    def get_rule_name(self):
+        if self.chain_result is not None:
+            return self.chain_result.get_rule_name()
+        return None
 
     def get_chain_result(self):
         return self.chain_result
@@ -78,9 +91,9 @@ class ChainDispatch(object):
                              perform_blocks=perform_blocks)
 
     def execute_value_extraction(self, string, frontend):
-        fe_results = frontend.match_pattern(self.extract_rule, string)
-        value = self.extract_value(fe_results)
-        return value, fe_results
+        rule_results = frontend.match_pattern(self.extract_rule, string)
+        value = self.extract_value(rule_results)
+        return value, rule_results
 
     def execute_dispatch(self, string, frontend=None):
         cdr = ChainDispatchResult(self.name)
@@ -90,9 +103,9 @@ class ChainDispatch(object):
         # TODO run a pre-check set of blocks or chains
         # before executing the value extraction
 
-        value, fe_results = self.execute_value_extraction(string, frontend)
+        value, rule_results = self.execute_value_extraction(string, frontend)
         cdr.extraction_value = value
-        cdr.fe_results = fe_results
+        cdr.rule_results = rule_results
 
         if value in self.value_chain_map:
             chains = self.value_chain_map[value]
@@ -103,4 +116,4 @@ class ChainDispatch(object):
             cdr.chain_outcome = chain_result.outcome
             cdr.last_block = chain_result.block_results.last_block
             cdr.chain_rvalue = chain_result.rvalue
-        return cdr.outcome, cdr
+        return cdr

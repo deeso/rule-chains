@@ -1,11 +1,25 @@
 class ChainResult(object):
-    def __init__(self, chain=None, block_result=None,
-                 outcome=None, rvalue=None, block_results=None):
-        self.chain = chain
+    def __init__(self, chain_type=None, chain_name=None, block_result=None,
+                 outcome=None, rvalue=None, block_results=None,
+                 block_name=None):
+        self.chain_type = chain_type
+        self.chain_name = chain_name
+        self.block_name = block_name
         self.block_result = block_result
         self.outcome = outcome
         self.rvalue = rvalue
         self.block_results = block_results
+
+    def get_rule_name(self):
+        if self.block_result is not None:
+            return self.block_result.get_rule_name()
+        return self.block_result
+
+    def get_rule_result(self):
+        if self.block_result is not None:
+            return self.block_result.get_rule_result()
+        return self.block_result
+
 
 class Chain(object):
     def __init__(self, name, block_objs={}, blocks=[], all_blocks=[],
@@ -104,32 +118,39 @@ class Chain(object):
         doret = False
         exit = False
         rvalue = None
-        block_results = {'last_block': '', 'last_chain': ''}
+        block_results = {'last_block': '', 'last_chain_type': ''}
         blocks_order = [i for i in self.perform_blocks]
+        kargs = {'chain_type': '', 'chain_name': self.name,
+                 'block_result': {}, 'outcome': False,
+                 'rvalue': None, 'block_results': block_results,
+                 'block_name': None}
+
         if len(blocks_order) == 0:
             blocks_order = ['blocks']
 
-        for chain in blocks_order:
+        block_results['chain_name'] = self.name
+        block_results['block_name'] = None
+        for chain_type in blocks_order:
             executed = False
-            if chain == 'blocks' and len(self.blocks) > 0:
+            if chain_type == 'blocks' and len(self.blocks) > 0:
                 executed = True
                 last_block, block_results = self.run_blocks(string, state, base_save_key)
                 block_results['last_block'] = last_block
-                block_results['last_chain'] = chain
-            elif chain == 'all' and len(self.all_blocks) > 0:
+                block_results['last_chain_type'] = chain_type
+            elif chain_type == 'all' and len(self.all_blocks) > 0:
                 executed = True
                 last_block, block_results = self.run_all_blocks(string, state, base_save_key)
                 block_results['last_block'] = last_block
-                block_results['last_chain'] = chain
-            elif chain == 'any' and len(self.any_blocks) > 0:
+                block_results['last_chain_type'] = chain_type
+            elif chain_type == 'any' and len(self.any_blocks) > 0:
                 executed = True
                 last_block, block_results = self.run_any_blocks(string, state, base_save_key)
-                block_results['last_chain'] = chain
+                block_results['last_chain_type'] = chain_type
                 block_results['last_block'] = last_block
-            elif chain == 'none' and len(self.none_blocks) > 0:
+            elif chain_type == 'none' and len(self.none_blocks) > 0:
                 executed = True
                 last_block, block_results = self.run_none_blocks(string, state, base_save_key)
-                block_results['last_chain'] = chain
+                block_results['last_chain_type'] = chain_type
                 block_results['last_block'] = last_block
             # in each of the check chains here is what the values mean
             # exit tells us we should exit as the result of a failure
@@ -139,15 +160,17 @@ class Chain(object):
             if executed:
                 last_block = block_results['last_block']
                 block_result = block_results[last_block]
-                outcome = block_result.outcome
+                kargs['outcome'] = block_result.outcome
                 doret = block_result.doret
                 exit = block_result.exit
-                rvalue = block_result.block_fn_result
+                kargs['chain_type'] = chain_type
+                kargs['block_result'] = block_result
+                kargs['rvalue'] = block_result.block_fn_result
                 if doret or exit:
                     break
-        if block_results['last_chain'] == '':
+        if block_results['last_chain_type'] == '':
             return ChainResult(None, None, False, None, {})
-        return ChainResult(chain, block_result, outcome, rvalue, block_results)
+        return ChainResult(**kargs)
 
     @classmethod
     def from_json(cls, json_data, block_objs={}):

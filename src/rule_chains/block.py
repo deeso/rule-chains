@@ -17,6 +17,12 @@ class BlockResult(object):
         self.return_value = return_value
         self.outcome = outcome
 
+    def get_rule_name(self):
+        return self.frontend_rule
+
+    def get_rule_result(self):
+        return self.frontend_results
+
 
 class Block(object):
     STATIC_LIST_LAMBDA = "lambda state, res: all([k in res and res[k] == v" +\

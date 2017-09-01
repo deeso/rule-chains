@@ -144,8 +144,6 @@ class GrokFrontend(BaseFrontend):
             # chain.update_frontend(self)
             self.chains[name] = chain
 
-
-
     def add_blocks(self, block_objs):
         for name, block in block_objs.items():
             block.update_frontend(self)
@@ -156,60 +154,92 @@ class GrokFrontend(BaseFrontend):
             self.dispatch_tables[name] = dispatch_table
 
     def execute_dispatch_tables(self, string):
-        results = []
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': None,
+                   'dispatch_results': []}
         success = False
         for name, dispatch_table in self.dispatch_tables.items():
-            success, cdr = dispatch_table.execute_dispatch(string)
-            results.append(cdr)
+            cdr = dispatch_table.execute_dispatch(string)
+            results['dispatch_results'].append(cdr)
             if success:
+                results['outcome'] = True
+                results['rule_name'] = cdr.get_rule_name()
+                results['rule_results'] = cdr.get_rule_results()
                 break
-        return success, results
+        return results
 
     def match_any(self, string, ignore_empty=True):
-        success, cdr = self.execute_dispatch_tables(string)
-        if success:
-            chain_result = cdr.chain_rvalue
-            return chain_result
+        results = self.execute_dispatch_tables(string)
+        if results['outcome']:
+            results['type'] = 'dispatcher'
+            return results
 
-        chain_rvalue = self.match_with_chains(string)
-        if chain_rvalue is not None:
-            return chain_rvalue
+        results = self.match_with_chains(string)
+        if results['outcome']:
+            results['type'] = 'chains'
+            return results
 
-        success, pattern_name, results = self.match_any_pattern(string)
+        results = self.match_any_pattern(string)
+        if results['outcome']:
+            results['type'] = 'pattern'
+        else:
+            results['type'] = None
         return results
 
     def match_any_pattern(self, string, ignore_empty=True):
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': None}
         for grok_name, grok in self.groks.items():
             v = grok.match(string)
             if v is not None and len(v) > 0:
-                return True, grok_name, v
-        return False, None, None
+                results['rule_name'] = grok_name
+                results['rule_results'] = v
+                results['outcome'] = True
+                return results
+        return results
 
     def match_with_chains(self, string):
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': None,
+                   'chain_result': None}
+        chain_result = None
         for name, chain in self.chains.items():
             chain_result = chain.execute_chain(string)
             if chain_result.outcome:
-                return chain_result.rvalue
-        return None
+                results['outcome'] = chain_result.outcome
+                results['rule_results'] = chain_result.get_rule_results()
+                results['rule_name'] = chain_result.get_rule_name()
+                results['chain_result'] = chain_result
+                return results
+        return results
 
     def match_pattern(self, pattern_name, string, ignore_empty=True):
-        v = None
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': pattern_name}
         if pattern_name in self.groks:
             grok = self.groks[pattern_name]
-            v = grok.match(string)
-            return v
+            results['rule_results'] = grok.match(string)
+            results['outcome'] = results['rule_results'] is not None and \
+                len(results['rule_results']) > 0
+            return results
         elif pattern_name in self.gr.predefined_patterns:
             p = self.get_pattern_regex(pattern_name)
             grok = pygrok.Grok(p, custom_patterns_dir=self.custom_patterns_dir)
-            v = grok.match(string)
-            return v
-        self.fail("Pattern name: %s does not exist" % pattern_name)
+            results['rule_results'] = grok.match(string)
+            results['outcome'] = results['rule_results'] is not None and \
+                len(results['rule_results']) > 0
+            return results
+        return results
 
     def match_runall_patterns(self, string, ignore_empty=True):
-        results = {}
-        for pattern, grok in self.groks.items():
-            v = grok.match(string)
-            if ignore_empty and (v is None or len(v) == 0):
+        all_results = {}
+        for pattern_name in self.groks.keys():
+            results = self.match_pattern(pattern_name, string)
+            if ignore_empty and results['outcome'] is False:
                 continue
-            results[pattern] = v
-        return results
+            all_results[pattern_name] = results
+        return all_results
