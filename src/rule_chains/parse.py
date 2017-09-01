@@ -83,6 +83,6 @@ class ParseRuleChainsConfig(object):
         chain_dispatch_tables = {}
         # print dispatch_json_data
         for name, dispatch_table_json in dispatch_json_data.items():
-            cdt = ChainDispatch.from_json(dispatch_table_json)
+            cdt = ChainDispatch.from_json(dispatch_table_json, chains=chain_objs)
             chain_dispatch_tables[name] = cdt
         return chain_dispatch_tables

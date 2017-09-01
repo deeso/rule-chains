@@ -151,6 +151,7 @@ class GrokFrontend(BaseFrontend):
 
     def add_chain_dispatch_tables(self, dispatch_tables):
         for name, dispatch_table in dispatch_tables.items():
+            dispatch_table.update_frontend(self)
             self.dispatch_tables[name] = dispatch_table
 
     def execute_dispatch_tables(self, string):

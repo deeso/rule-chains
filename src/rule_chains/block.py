@@ -33,7 +33,7 @@ class Block(object):
     PARAMETERIZED_LAMBDA = "lambda state, res: res is not None and all([])"
 
     def __init__(self, name, frontend_rule, ctype, cvalue,
-                 return_something=False, exit_on_fail=False, 
+                 return_something=False, exit_on_fail=False,
                  return_rule=None, return_results=False, return_value=None):
 
         self.frontend = None
@@ -112,8 +112,7 @@ class Block(object):
         block_result = None
         if results is not None and len(results) > 0:
             block_result = self.block_fn(state, results)
-            # print block_result           
-
+            # print block_result
         br.outcome = block_result if isinstance(block_result, bool) \
             else block_result is not None
 
