@@ -7,7 +7,6 @@ An approach to creating chains based of grok rules.  The goal is to use grok to 
 * write documentation and update comments
 * audit code and remove cruft
 * add logging for debugging and monitoring
-* fix the code factory functions and add the following:
 
 
 
