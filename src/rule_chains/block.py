@@ -31,6 +31,8 @@ class BlockResult(object):
 
 
 class Block(object):
+    CO_CREATE_FAILED = "Code object (%s) from: %s not created"
+    CO_MISSING = "Code object for: %s not in globals or locals"
     STATIC_LIST_LAMBDA = "lambda state, res: all([k in res and res[k] == v" +\
                          " for k, v in state.get('__values', [])])"
     STATIC_DICT_LAMBDA = "lambda state, res: all([k in res and res[k] == v" +\
@@ -57,8 +59,8 @@ class Block(object):
         if ctype == 'static_list':
             self.set__values = True
             self.__values = cvalue
-
-        self.block_fn = self.code_factory(ctype, cvalue)
+        cf_name = self.name + "_" + ctype
+        self.block_fn = self.code_factory(ctype, cvalue, cf_name)
         self.return_rule = return_rule
         self.return_results = return_results
         self.return_value = None
@@ -89,7 +91,7 @@ class Block(object):
         return results
 
     @classmethod
-    def code_factory(cls, ctype, cvalue):
+    def code_factory(cls, ctype, cvalue, cf_name):
         if ctype == 'lambda':
             return eval(cvalue)
         elif ctype == 'static_list':
@@ -97,7 +99,26 @@ class Block(object):
         elif ctype == 'static_dict':
             return eval(cls.STATIC_DICT_LAMBDA)
         elif ctype == 'function':
-            return eval(cvalue)
+            co = None
+            fn_obj = None
+            # compile script to usable code
+            try:
+                co = compile(cvalue, '<string>', 'exec')
+            except Exception, e:
+                raise Exception(cls.CO_CREATE_FAILED % (cf_name, str(e)))
+
+            # eval the code to get it in the environment
+            if co is not None:
+                eval(co)
+
+            # find the function in the globals or locals
+            fn_obj = globals().get(cf_name, None)
+            if fn_obj is None:
+                fn_obj = locals().get(cf_name, None)
+
+            if fn_obj is None:
+                raise Exception(cls.CO_MISSING % cf_name)
+            return fn_obj
         return lambda state, res: False
 
     def execute(self, string, state={}, frontend=None, save_key=None):
