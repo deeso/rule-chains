@@ -6,6 +6,7 @@
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('ip_proto', '') == '6'"
     return_results = true
+    return_rule = "PFSENSE_TCP_RULE_V4"
 
     [blocks.tcp_v6_check]
     name = "tcp_v6_check"
@@ -13,6 +14,7 @@
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('ip_proto', '') == '6'"
     return_results = true
+    return_rule = "PFSENSE_TCP_RULE_V6"
 
     [blocks.udp_v4_check]
     name = "udp_v4_check"
@@ -28,6 +30,7 @@
     ctype = "static_list"
     cvalue = [["ip_proto", "17"]]
     return_results = true
+    return_rule = "PFSENSE_UDP_RULE_V6"
 
     [blocks.ip_v4_check]
     name = "ip_v4_check"
