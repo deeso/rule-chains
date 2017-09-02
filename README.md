@@ -2,6 +2,15 @@
 
 An approach to creating chains based of grok rules.  The goal is to use grok to match keys in a message, and then use the matched keys to perform additional matching or mark-ups.
 
+### TODO ###
+* write testing code to find bugs and prevent regressions
+* write documentation and update comments
+* audit code and remove cruft
+* add logging for debugging and monitoring
+* fix the code factory functions and add the following:
+
+
+
 ### What is this repository for? ###
 
 * creating chains and using grok
@@ -9,15 +18,10 @@ An approach to creating chains based of grok rules.  The goal is to use grok to 
 
 ### How do I get set up? ###
 
-* pip pip install https://github.com/deeso/rule_chains.git
+* pip install https://github.com/deeso/rule_chains.git
 
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
 
 ### Who do I talk to? ###
 
 * deeso | adam.pridgen@thecoverofnight.com
+
