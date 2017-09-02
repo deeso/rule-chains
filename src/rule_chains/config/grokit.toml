@@ -20,6 +20,7 @@
     ctype = "static_list"
     cvalue = [["ip_proto", "17"]]
     return_results = true
+    return_rule = "PFSENSE_UDP_RULE_V4"
 
     [blocks.udp_v6_check]
     name = "udp_v6_check"
@@ -72,7 +73,7 @@
     perform_blocks = ["any"]
 
     [chains.check_udp]
-    name = "check_tcp"
+    name = "check_udp"
     any = ["udp_v4_check", "udp_v6_check"]
     perform_blocks = ["any"]
 
@@ -96,7 +97,7 @@
     perform_checks = ["any"]
 
     [chain_definition.filterlog.chains.check_udp]
-    name = "check_tcp"
+    name = "check_udp"
     any = ["udp_v4_check", "udp_v6_check"]
     perform_checks = ["any"]
 

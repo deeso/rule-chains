@@ -27,3 +27,6 @@ chain_result = check_ip.execute_chain(msg)
 # print the results from the block that return
 print(chain_result.block_result.frontend_rule)
 print(chain_result.block_result.return_value)
+
+dr = gr.execute_dispatch_tables(msg)
+print(dr)

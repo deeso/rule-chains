@@ -5,22 +5,28 @@ class BlockResult(object):
     def __init__(self, name, block_fn_result=None, doret=False,
                  exit_on_fail=False, state=None, save_value=None,
                  frontend_results=None, frontend_rule=None,
-                 return_value=None, outcome=False):
-        self.name = name
+                 return_value=None, outcome=False, return_rule=None):
+        self.block_name = name
         self.block_fn_result = block_fn_result
         self.doret = doret
         self.exit = exit_on_fail
         self.state = state
         self.save_value = save_value
-        self.frontend_results = frontend_results
         self.frontend_rule = frontend_rule
+        self.frontend_results = frontend_results
+        self.return_rule = return_rule
         self.return_value = return_value
         self.outcome = outcome
+        # print self.block_name, self.return_rule
 
     def get_rule_name(self):
+        if self.return_rule is not None:
+            return self.return_rule
         return self.frontend_rule
 
     def get_rule_result(self):
+        if self.return_rule is not None:
+            return self.return_value
         return self.frontend_results
 
 
@@ -59,6 +65,8 @@ class Block(object):
         self.return_something = return_something or \
             return_rule is not None or \
             return_results
+
+        # print self.name, self.return_rule
 
     def update_frontend(self, frontend):
         self.frontend = frontend
@@ -105,43 +113,50 @@ class Block(object):
         if self.set__values:
             state['__values'] = self.__values
 
-        results = frontend.match_pattern(self.frontend_rule, string)
-        br.frontend_results = results
+        initial_results = frontend.match_pattern(self.frontend_rule, string)
+        br.frontend_results = initial_results
         br.frontend_rule = self.frontend_rule
 
-        block_result = None
-        if results is not None and len(results) > 0:
-            block_result = self.block_fn(state, results)
-            # print block_result
-        br.outcome = block_result if isinstance(block_result, bool) \
-            else block_result is not None
+        block_fn_result = None
+        _rule_results = initial_results.get('rule_results', {})
+        if _rule_results is not None and len(_rule_results) > 0:
+            block_fn_result = self.block_fn(state, _rule_results)
+            # print block_fn_result
+        br.outcome = block_fn_result if isinstance(block_fn_result, bool) \
+            else block_fn_result is not None
 
-        br.block_fn_result = block_result
+        br.block_fn_result = block_fn_result
         if save_key is not None:
-            save_value = {'grok_results': results,
-                          'block_result': block_result}
+            save_value = {'grok_results': initial_results,
+                          'block_fn_result': block_fn_result}
             state[save_key] = save_value
 
         del state['self']
-        if self.exit_on_fail and not block_result:
+        if self.exit_on_fail and not block_fn_result:
             br.exit_on_fail = True
             save_value['exit_on_fail'] = True
 
-        if self.return_results:
+        if block_fn_result and self.return_results and\
+                self.return_rule is not None:
+
             save_value['return'] = True
-            save_value['rvalue'] = results
-            br.return_value = results
+            rresults = frontend.match_pattern(self.return_rule, string)
+            br.return_value = rresults
+            br.return_rule = self.return_rule
+            save_value['rvalue'] = rresults
+            save_value['return_rule_name'] = self.return_rule
+            # br.return_value = br.frontend_results
             br.doret = True
             return br
-        elif self.return_rule is not None:
+        elif block_fn_result and self.return_results and\
+                self.return_rule is None:
+
             save_value['return'] = True
-            save_value['rvalue'] = frontend.match_pattern(self.frontend_rule)
-            save_value['return_rule_name'] = self.frontend_rule
-            br.return_value = br.frontend_results
+            save_value['rvalue'] = initial_results
+            br.return_value = initial_results
             br.doret = True
-            br.return_value = save_value['rvalue']
             return br
-        elif self.return_value is not None:
+        elif block_fn_result and self.return_value is not None:
             save_value['return'] = True
             save_value['rvalue'] = self.return_value
             br.return_value = self.return_value
@@ -151,6 +166,7 @@ class Block(object):
 
     @classmethod
     def from_json(cls, json_data):
+        # print json_data
         name = json_data.get('name', None)
         frontend_rule = json_data.get('frontend_rule', None)
         ctype = json_data.get('ctype', None)
@@ -162,7 +178,7 @@ class Block(object):
             raise Exception("Missing required Block parameters")
 
         return_results = json_data.get('return_results', False)
-        return_rule = json_data.get('return_rule', False)
+        return_rule = json_data.get('return_rule', None)
         return_value = json_data.get('return_value', None)
         exit_on_fail = json_data.get('exit_on_fail', False)
         return_something = json_data.get('return_something', False)

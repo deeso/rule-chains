@@ -2,25 +2,25 @@ class ChainDispatchResult(object):
     def __init__(self, table_name, chain_name=None, success=False,
                  chain_result=None,
                  block_results=None, chain_results=None, rvalue=None,
-                 rule_results=None, chain=None, outcome=False,
-                 extraction_value=None, last_block=None):
+                 extraction_rule_results=None, outcome=False,
+                 extraction_value=None, block_name=None):
 
-        self.chain = chain
         self.table_name = table_name
-        self.rule_results = rule_results
+        self.extraction_rule_results = extraction_rule_results
         self.extraction_value = extraction_value
         self.chain_name = chain_name
         self.chain_outcome = outcome
         self.chain_rvalue = rvalue
-        self.last_block = last_block
+        self.block_name = block_name
         self.block_results = block_results
         self.chain_result = chain_result
         self.outcome = outcome
 
+
     def get_chain_result(self):
         return self.chain_result
 
-    def get_rule_result(self):
+    def get_rule_results(self):
         if self.chain_result is not None:
             return self.chain_result.get_rule_result()
         return None
@@ -30,8 +30,14 @@ class ChainDispatchResult(object):
             return self.chain_result.get_rule_name()
         return None
 
-    def get_chain_result(self):
-        return self.chain_result
+    def update_from_chain_result(self, chain_result):
+        self.chain_name = chain_result.chain_name
+        self.chain_result = chain_result
+        self.chain_outcome = chain_result.outcome
+        self.block_name = chain_result.block_name
+        self.block_results = chain_result.block_results
+        self.chain_rvalue = chain_result.rvalue
+        self.outcome = chain_result.outcome
 
 
 class ChainDispatch(object):
@@ -59,7 +65,7 @@ class ChainDispatch(object):
         return lambda state, res: None
 
     @classmethod
-    def from_json(cls, json_data, block_objs={}, chains={}):
+    def from_json(cls, json_data, block_objs={}, chains={}, chains_def={}):
         name = json_data.get('name', None)
         extract_rule = json_data.get('extract_rule', None)
         etype = json_data.get('extract_type', None)
@@ -80,9 +86,8 @@ class ChainDispatch(object):
             raise Exception("Missing required Block parameters")
 
         dispatch_table = {}
-        print json_data.get('dispatch_table')
+        # print json_data.get('dispatch_table')
         for k, v in json_data.get('dispatch_table', []):
-            print chains
             c = chains.get(v, None)
             dispatch_table[k] = c
 
@@ -94,9 +99,10 @@ class ChainDispatch(object):
 
     def execute_value_extraction(self, string, frontend=None, state={}):
         frontend = frontend if frontend is not None else self.frontend
-        rule_results = frontend.match_pattern(self.extract_rule, string)
-        value = self.extract_value(state, rule_results)
-        return value, rule_results
+        results = frontend.match_pattern(self.extract_rule, string)
+        value = self.extract_value(state, results.get('rule_results', {}))
+        # print "value is: ", value
+        return value, results
 
     def execute_dispatch(self, string, frontend=None, state={}):
         cdr = ChainDispatchResult(self.name)
@@ -109,18 +115,15 @@ class ChainDispatch(object):
 
         value, rule_results = self.execute_value_extraction(string,
                                                             frontend, state)
+        # print value, rule_results
         cdr.extraction_value = value
-        cdr.rule_results = rule_results
-        print self.dispatch_table
+        cdr.extraction_rule_results = rule_results
+
         if value in self.dispatch_table:
             chains = self.dispatch_table[value]
             chain_result = chains.execute_chains(string)
-            cdr.chain_result = chain_result
-            cdr.chain_name = chain_result.chain
-            cdr.block_results = chain_result.block_results
-            cdr.chain_outcome = chain_result.outcome
-            cdr.last_block = chain_result.block_results.last_block
-            cdr.chain_rvalue = chain_result.rvalue
+            cdr.update_from_chain_result(chain_result)
+
         return cdr
 
     def update_frontend(self, frontend):

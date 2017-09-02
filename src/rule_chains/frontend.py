@@ -68,6 +68,7 @@ class GrokFrontend(BaseFrontend):
         self.program_matches = {}
         self.groks = {}
         self.chains = {}
+        self.load_results = None
 
         self.gr = pygrok.Grok('dummy', custom_patterns_dir=custom_patterns_dir)
         self.loaded_patterns = self.gr.predefined_patterns
@@ -86,7 +87,8 @@ class GrokFrontend(BaseFrontend):
             self.load_from_config()
 
     def load_from_config(self):
-        return ParseRuleChainsConfig.parse(self.config, frontend=self)
+        self.load_results = ParseRuleChainsConfig.parse(self.config, frontend=self)
+        return self.load_results
 
     def load_rule_from_frontend(self, pattern_name):
         if self.is_pattern_available(pattern_name):
@@ -159,11 +161,11 @@ class GrokFrontend(BaseFrontend):
                    'rule_results': None,
                    'rule_name': None,
                    'dispatch_results': []}
-        success = False
+
         for name, dispatch_table in self.dispatch_tables.items():
             cdr = dispatch_table.execute_dispatch(string)
             results['dispatch_results'].append(cdr)
-            if success:
+            if cdr.outcome:
                 results['outcome'] = True
                 results['rule_name'] = cdr.get_rule_name()
                 results['rule_results'] = cdr.get_rule_results()

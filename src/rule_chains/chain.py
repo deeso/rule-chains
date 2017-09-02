@@ -20,6 +20,10 @@ class ChainResult(object):
             return self.block_result.get_rule_result()
         return self.block_result
 
+    def __str__(self):
+        msg = "{chain_name}:{chain_type}[{block_name}] == {outcome}: {rvalue}"
+        return msg.format(**self.__dict__)
+
 
 class Chain(object):
     def __init__(self, name, block_objs={}, blocks=[], all_blocks=[],
@@ -160,12 +164,14 @@ class Chain(object):
             if executed:
                 last_block = block_results['last_block']
                 block_result = block_results[last_block]
-                kargs['outcome'] = block_result.outcome
                 doret = block_result.doret
                 exit = block_result.exit
+                kargs['outcome'] = block_result.outcome
+                kargs['block_name'] = last_block
                 kargs['chain_type'] = chain_type
                 kargs['block_result'] = block_result
-                kargs['rvalue'] = block_result.block_fn_result
+                kargs['block_results'] = block_results
+                kargs['rvalue'] = block_result.return_value
                 if doret or exit:
                     break
         if block_results['last_chain_type'] == '':
