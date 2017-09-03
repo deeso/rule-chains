@@ -39,6 +39,9 @@ class BaseFrontend(object):
     def execute_dispatch_tables(self, string):
         raise Exception("Not implemented")
 
+    def execute_dispatch_table(self, table_name, string):
+        raise Exception("Not implemented")
+
     def match_any(self, string, ignore_empty=True):
         raise Exception("Not implemented")
 
@@ -156,14 +159,31 @@ class GrokFrontend(BaseFrontend):
             dispatch_table.update_frontend(self)
             self.dispatch_tables[name] = dispatch_table
 
+    def execute_dispatch_table(self, table_name, string):
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': None,
+                   'dispatch_result': None}
+
+        dispatch_table = self.dispatch_tables.get(table_name, None)
+        if dispatch_table is not None:
+            cdr = dispatch_table.execute_dispatch(string)
+            results['dispatch_result'] = cdr
+            if cdr.outcome:
+                results['outcome'] = True
+                results['rule_name'] = cdr.get_rule_name()
+                results['rule_results'] = cdr.get_rule_results()
+        return results
+
     def execute_dispatch_tables(self, string):
         results = {'outcome': False,
                    'rule_results': None,
                    'rule_name': None,
                    'dispatch_results': []}
 
-        for name, dispatch_table in self.dispatch_tables.items():
-            cdr = dispatch_table.execute_dispatch(string)
+        for name in self.dispatch_tables:
+            result = self.execute_dispatch_table(name, string)
+            cdr = result['dispatch_result']
             results['dispatch_results'].append(cdr)
             if cdr.outcome:
                 results['outcome'] = True

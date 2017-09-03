@@ -55,7 +55,7 @@
 
 [chain_tables]
     [chain_tables.syslog_dispatcher]
-    name = "syslog_app_dispatch"
+    name = "syslog_dispatcher"
     perform_checks = ['all']
     dispatch_table = [["filterlog", "filterlog"],
                     ["openvpn", "openvpn"]]

@@ -1,6 +1,7 @@
 from rule_chains import get_names, get_patterns, get_grokit_config
 from rule_chains.frontend import GrokFrontend
 
+SYSLOG_DISPATCH = 'syslog_dispatcher'
 
 # PFSense patterns loaded to pygrok
 gr = GrokFrontend(  # default chains configuration
@@ -30,3 +31,6 @@ print(chain_result.block_result.return_value)
 
 dr = gr.execute_dispatch_tables(msg)
 print(dr)
+
+dr2 = gr.execute_dispatch_table(SYSLOG_DISPATCH, msg)
+print(dr2)
