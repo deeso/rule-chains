@@ -213,7 +213,7 @@
 
 [groups]
 other = ["SYSLOG_PRE"]
-ngnix = ["NGINXACCESS"]
+ngnix = ["NGINX_ACCESS_RULE"]
 
 openvpn = [
     "OPENVPN_MGMT_CONN",
