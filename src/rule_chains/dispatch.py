@@ -118,9 +118,8 @@ class ChainDispatch(object):
         # print value, rule_results
         cdr.extraction_value = value
         cdr.extraction_rule_results = rule_results
-
-        if value in self.dispatch_table:
-            chains = self.dispatch_table[value]
+        chains = self.dispatch_table.get(value, None)
+        if chains is not None:
             chain_result = chains.execute_chains(string)
             cdr.update_from_chain_result(chain_result)
 
