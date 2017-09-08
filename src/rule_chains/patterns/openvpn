@@ -7,17 +7,33 @@ OPENVPN_RHOST_INFO %{IPORHOST:remote_host}:%{POSINT:remote_port}
 OPENVPN_CTRL_STATUS [a-zA-Z0-9_]+
 OPENVPN_SID %{BASE16NUM} %{BASE16NUM}
 OPENVPN_CIPHER_SPEC [a-zA-Z0-9._-]+
-OPENVPN_TLS_FAILED_UNAME_PASS_AUTH TLS Auth Error: Auth Username/Password verification failed for peer
-OPENVPN_DCE Data Channel Encrypt
-OPENVPN_DDE Data Channel Decrypt
+
+OVPN_FAILED failed
+OPENVPN_TLS_FAILED_UNAME_PASS_AUTH TLS Auth Error: Auth Username/Password verification %{OVPN_FAILED:auth_outcome} for peer
+
+OVPN_DCE Encrypt
+OPENVPN_DCE Data Channel %{OVPN_DCE:data_channel_type}
+
+OVPN_DDE Decrypt
+OPENVPN_DDE Data Channel %{OVPN_DDE:data_channel_type}
+
 OPENVPN_CC Control Channel
 OPENVPN_TLS_PKT_FROM_AFNET TLS: Initial packet from \[AF_INET\]
-OPENVPN_TLS_AUTHN_SUCCEED TLS: Username/Password authentication succeeded for username
 
-OPENVPN_MGMT_CONNECT MANAGEMENT: Client connected from
-OPENVPN_MGMT_CMD_STAT2 MANAGEMENT: CMD 'status 2'
-OPENVPN_MGMT_CMD_QUIT MANAGEMENT: CMD 'quit'
-OPENVPN_MGMT_DISCONNECT MANAGEMENT: Client disconnected
+OVPN_SUCC succeeded
+OPENVPN_TLS_AUTHN_SUCCEED TLS: Username/Password authentication %{OVPN_SUCC:auth_state} for username
+
+OVPN_CONN connected
+OPENVPN_MGMT_CONNECT MANAGEMENT: Client %{OVPN_CONN:management_action} from
+
+OVPN_STATUS2 status 2
+OPENVPN_MGMT_CMD_STAT2 MANAGEMENT: CMD '%{OVPN_STATUS2:management_action}'
+
+OVPN_QUIT quit
+OPENVPN_MGMT_CMD_QUIT MANAGEMENT: CMD '%{OVPN_QUIT:management_action}'
+
+OVPN_DISCONN disconnect
+OPENVPN_MGMT_DISCONNECT MANAGEMENT: Client %{OVPN_DISCONN:management_action}
 
 OPENVPN_MULTI_SVA_STR MULTI_sva: pool returned
 OPENVPN_NE \(Not enabled\)
