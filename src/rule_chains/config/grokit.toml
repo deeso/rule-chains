@@ -169,7 +169,7 @@
     name = "ip_v6_check"
     frontend_rule = "PFSENSE_IP_RULE_V6"
     ctype = "static_list"
-    cvalue = [["ip_proto", "17"]]
+    cvalue = [["ip_version", "6"]]
     return_results = true
 
     [blocks.syslog_program_check]
