@@ -212,7 +212,9 @@
 
 
 [groups]
-other = ["SYSLOG_PRE", "SSH_LOCKOUT_RULE", "USR_SBIN_CRON_RULE"]
+other = ["SYSLOG_PRE", 
+         "SSHLOCKOUT_RULE", 
+         "USR_SBIN_CRON_RULE"]
 ngnix = ["NGINX_ACCESS_RULE"]
 sshd = ["SSHD_BAD_PROTO_RULE",
         "SSHD_INTERACTIVE_SESSION_RULE",
