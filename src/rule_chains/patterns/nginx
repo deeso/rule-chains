@@ -1,9 +1,10 @@
 SYSLOG_FACILITY <%{POSINT:syslog_facility}>
 SYSLOG_PRE (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}:
 SYSLOG_PRE_MSG (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}: %{GREEDYDATA:syslog_message}
+
 NGINX_SYSLOG_PRE (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}:
 NGUSERNAME [a-zA-Z\.\@\-\+_%]+
 NGUSER %{NGUSERNAME}
-NGINXACCESS %{IPORHOST:src_ip} %{NGUSER:username} %{NGUSER:password} \[%{HTTPDATE:timestamp}\] "%{WORD:verb} %{URIPATHPARAM:request} HTTP/%{NUMBER:httpversion}" %{NUMBER:response} (?:%{NUMBER:bytes}|-) (?:"(?:%{URI:referrer}|-)"|%{QS:referrer}) "%{GREEDYDATA:user_agent}"
+NGINXACCESS %{IPORHOST:src_ip} %{NGUSER:username} %{NGUSER:password} \[%{HTTPDATE:http_timestamp}\] "%{WORD:verb} %{URIPATHPARAM:request} HTTP/%{NUMBER:httpversion}" %{NUMBER:response} (?:%{NUMBER:bytes}|-) (?:"(?:%{URI:referrer}|-)"|%{QS:referrer}) "%{GREEDYDATA:user_agent}"
 
 NGINX_ACCESS_RULE %{NGINX_SYSLOG_PRE} %{NGINXACCESS}
