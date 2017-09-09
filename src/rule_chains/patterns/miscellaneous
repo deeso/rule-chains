@@ -1,9 +1,7 @@
 SYSLOG_FACILITY <%{POSINT:syslog_facility}>
-
 SSHLOCKOUT sshlockout
 SSHLOCKOUT_PROG %{SSHLOCKOUT:program}(?:\[%{POSINT:pid}\])?
 SSHLOCKOUT_RULE (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SSHLOCKOUT_PROG}: %{GREEDYDATA:syslog_message}
-
 USR_SBIN_CRON \/usr\/sbin\/cron
 USR_SBIN_CRON_INFO \(%{USERNAME:username}\) %{WORD:job_type} \(%{GREEDYDATA:job_data}\)
 USR_SBIN_CRON_PROG %{USR_SBIN_CRON:program}(?:\[%{POSINT:pid}\])?
