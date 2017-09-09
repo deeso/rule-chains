@@ -17,12 +17,12 @@ class ChainDispatchResult(object):
         self.outcome = outcome
 
 
-    def get_chain_result(self):
+    def get_chain_results(self):
         return self.chain_result
 
     def get_rule_results(self):
         if self.chain_result is not None:
-            return self.chain_result.get_rule_result()
+            return self.chain_result.get_rule_results()
         return None
 
     def get_rule_name(self):
