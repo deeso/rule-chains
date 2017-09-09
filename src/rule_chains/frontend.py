@@ -51,6 +51,9 @@ class BaseFrontend(object):
     def match_with_chains(self, string):
         raise Exception("Not implemented")
 
+    def match_with_chain(self, chain_name, string):
+        raise Exception("Not implemented")
+
     def match_pattern(self, pattern_name, string, ignore_empty=True):
         raise Exception("Not implemented")
 
@@ -223,19 +226,31 @@ class GrokFrontend(BaseFrontend):
                 return results
         return results
 
-    def match_with_chains(self, string):
+    def match_with_chain(self, chain_name, string):
         results = {'outcome': False,
                    'rule_results': None,
                    'rule_name': None,
                    'chain_result': None}
         chain_result = None
-        for name, chain in self.chains.items():
+        chain = self.chains.get(chain_name, None)
+        if chain is not None:
             chain_result = chain.execute_chain(string)
             if chain_result.outcome:
                 results['outcome'] = chain_result.outcome
                 results['rule_results'] = chain_result.get_rule_results()
                 results['rule_name'] = chain_result.get_rule_name()
                 results['chain_result'] = chain_result
+                return results
+        return results
+
+    def match_with_chains(self, string):
+        results = {'outcome': False,
+                   'rule_results': None,
+                   'rule_name': None,
+                   'chain_result': None}
+        for name in self.chains:
+            results = self.match_with_chain(name, string)
+            if results['outcome']:
                 return results
         return results
 

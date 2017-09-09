@@ -15,7 +15,7 @@ class ChainResult(object):
             return self.block_result.get_rule_name()
         return self.block_result
 
-    def get_rule_result(self):
+    def get_rule_results(self):
         if self.block_result is not None:
             return self.block_result.get_rule_result()
         return self.block_result

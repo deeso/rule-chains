@@ -14,7 +14,7 @@ DISPATCH_TABLES = "chain_tables"
 class ParseRuleChainsConfig(object):
     @classmethod
     def parse(cls, toml_config, frontend=None):
-        print toml_config
+        # print toml_config
         data = toml.load(open(toml_config))
         # parse blocks
         blocks_json = data.get(BLOCKS, {})

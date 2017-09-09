@@ -187,7 +187,6 @@ class Block(object):
 
     @classmethod
     def from_json(cls, json_data):
-        # print json_data
         name = json_data.get('name', None)
         frontend_rule = json_data.get('frontend_rule', None)
         ctype = json_data.get('ctype', None)
