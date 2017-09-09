@@ -5,109 +5,126 @@
     frontend_rule = "PFSENSE_ICMP_ECHO_REQ_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'request'"
+    return_results = true
 
     [blocks.icmp_v6_check_reply]
     name = "icmp_v6_check_reply"
     frontend_rule = "PFSENSE_ICMP_ECHO_REP_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'reply'"
+    return_results = true
 
     [blocks.icmp_v6_check_unreachproto]
     name = "icmp_v6_check_unreachproto"
     frontend_rule = "PFSENSE_ICMP_UNREACHABLE_PROTO_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreachproto'"
+    return_results = true
 
     [blocks.icmp_v6_check_unreachport]
     name = "icmp_v6_check_unreachport"
     frontend_rule = "PFSENSE_ICMP_UNREACHABLE_PORT_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreachport'"
+    return_results = true
 
     [blocks.icmp_v6_check_needfrag]
     name = "icmp_v6_check_needfrag"
     frontend_rule = "PFSENSE_ICMP_NEED_FRAG_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'needfrag'"
-
+    return_results = true
 
     [blocks.icmp_v6_check_tstamp]
     name = "icmp_v6_check_tstamp"
     frontend_rule = "PFSENSE_ICMP_TIMESTAMP_REQ_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'tstamp'"
+    return_results = true
 
     [blocks.icmp_v6_check_tstampreply]
     name = "icmp_v6_check_tstampreply"
     frontend_rule = "PFSENSE_ICMP_TIMESTAMP_REP_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'tstampreply'"
+    return_results = true
 
     [blocks.icmp_v6_check_unreach]
     name = "icmp_v6_check_unreach"
     frontend_rule = "PFSENSE_ICMP_OTHER_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreach'"
+    return_results = true
 
     [blocks.icmp_v6_check_other]
     name = "icmp_v6_check_other"
     frontend_rule = "PFSENSE_ICMP_OTHER_RULE_V6"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None"
+    return_results = true
 
     [blocks.icmp_v4_check_request]
     name = "icmp_v4_check_request"
     frontend_rule = "PFSENSE_ICMP_ECHO_REQ_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'request'"
+    return_results = true
 
     [blocks.icmp_v4_check_reply]
     name = "icmp_v4_check_reply"
     frontend_rule = "PFSENSE_ICMP_ECHO_REP_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'reply'"
+    return_results = true
 
     [blocks.icmp_v4_check_unreachproto]
     name = "icmp_v4_check_unreachproto"
     frontend_rule = "PFSENSE_ICMP_UNREACHABLE_PROTO_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreachproto'"
+    return_results = true
 
     [blocks.icmp_v4_check_unreachport]
     name = "icmp_v4_check_unreachport"
     frontend_rule = "PFSENSE_ICMP_UNREACHABLE_PORT_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreachport'"
+    return_results = true
 
     [blocks.icmp_v4_check_needfrag]
     name = "icmp_v4_check_needfrag"
     frontend_rule = "PFSENSE_ICMP_NEED_FRAG_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'needfrag'"
+    return_results = true
 
     [blocks.icmp_v4_check_tstamp]
     name = "icmp_v4_check_tstamp"
     frontend_rule = "PFSENSE_ICMP_TIMESTAMP_REQ_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'tstamp'"
+    return_results = true
 
     [blocks.icmp_v4_check_tstampreply]
     name = "icmp_v4_check_tstampreply"
     frontend_rule = "PFSENSE_ICMP_TIMESTAMP_REP_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'tstampreply'"
+    return_results = true
 
     [blocks.icmp_v4_check_unreach]
     name = "icmp_v4_check_unreach"
     frontend_rule = "PFSENSE_ICMP_OTHER_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None and res.get('icmp_type') == 'unreach'"
+    return_results = true
 
     [blocks.icmp_v4_check_other]
     name = "icmp_v4_check_other"
     frontend_rule = "PFSENSE_ICMP_OTHER_RULE_V4"
     ctype = "lambda"
     cvalue = "lambda state, res: res is not None and res.get('icmp_type', None) is not None"
+    return_results = true
 
     [blocks.tcp_v4_check]
     name = "tcp_v4_check"
