@@ -1,0 +1,29 @@
+SYSLOG_FACILITY <%{POSINT:syslog_facility}>
+SYSLOG_PRE (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}:
+SYSLOG_PRE_MSG (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}: %{GREEDYDATA:syslog_message}
+
+SSHD_SYSLOG_PRE (?:%{SYSLOG_FACILITY})%{SYSLOGTIMESTAMP:syslog_timestamp} (%{IPORHOST:syslog_server} )?%{SYSLOGPROG}:
+
+SSHD_DEF_PROTO '%{GREEDYDATA:protocol}'
+SSHD_BAD_PROTOCOL Bad protocol version identification %{SSHD_DEF_PROTO} from %{IPORHOST:src_ip} port %{POSINT:src_port}
+SSHD_BAD_PROTO_RULE %{SSHD_SYSLOG_PRE} %{SSHD_BAD_PROTOCOL}
+
+SSH_SESSION_TYPE [a-zA-Z\.\@\-\+_%\\/]+
+SSHD_INTERACTIVE_SESSION Accepted %{SSH_SESSION_TYPE:ssh_session_type} for %{USERNAME:username} from %{IPORHOST:src_ip} port %{POSINT:src_port} %{WORD:ssh_version}
+SSHD_INTERACTIVE_SESSION_RULE %{SSHD_SYSLOG_PRE} %{SSHD_INTERACTIVE_SESSION}
+
+SSHD_BACKGROUND_SESSION Postponed %{SSH_SESSION_TYPE:ssh_session_type} for %{USERNAME:username} from %{IPORHOST:src_ip} port %{POSINT:src_port} %{WORD:ssh_version} \[%{GREEDYDATA:ssh_state}\]
+SSHD_BACKGROUND_SESSION_RULE %{SSHD_SYSLOG_PRE} %{SSHD_BACKGROUND_SESSION}
+
+SSHD_CONNECTION_RESET Connection reset by %{IPORHOST:src_ip} port %{POSINT:src_port} \[%{GREEDYDATA:ssh_state}\]
+SSHD_CONNECTION_RESET_RULE %{SSHD_SYSLOG_PRE} %{SSHD_CONNECTION_RESET}
+
+SSHD_CLIENT_TIMEOUT Timeout, client not responding.
+SSHD_CLIENT_TIMEOUT_RULE %{SSHD_SYSLOG_PRE} %{SSHD_CLIENT_TIMEOUT}
+
+SSHD_CLIENT_DISCONNECTED Disconnected from %{IPORHOST:src_ip} port %{POSINT:src_port}
+SSHD_CLIENT_DISCONNECTED_RULE %{SSHD_SYSLOG_PRE} %{SSHD_CLIENT_DISCONNECTED}
+
+SSHD_DISCONNECT Received disconnect from %{IPORHOST:src_ip} port %{POSINT:src_port}:%{POSINT:ssh_channel}: %{GREEDYDATA:disconnect_reason}
+SSHD_DISCONNECT_RULE %{SSHD_SYSLOG_PRE} %{SSHD_DISCONNECT}
+
