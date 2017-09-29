@@ -6,7 +6,7 @@ import os
 data_files = [(d, [os.path.join(d, f) for f in files])
               for d, folders, files in os.walk(os.path.join('src', 'config'))]
 
-setup(name='rule_chains',
+setup(name='rule-chains',
       version='1.0',
       description='chain together rules from grok',
       author='adam pridgen',
