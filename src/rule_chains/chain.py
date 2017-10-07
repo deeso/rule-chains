@@ -41,7 +41,7 @@ class Chain(object):
 
     def update_frontend(self, frontend):
         self.frontend = frontend
-        for block in self.blocks.values():
+        for block in list(self.blocks.values()):
             block.update_frontend(frontend)
 
     def serialize(self):

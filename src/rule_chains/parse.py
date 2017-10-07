@@ -1,8 +1,8 @@
 import toml
-from block import Block
-from chain import Chain
-from chaindef import ChainDefinition
-from dispatch import ChainDispatch
+from .block import Block
+from .chain import Chain
+from .chaindef import ChainDefinition
+from .dispatch import ChainDispatch
 
 BLOCKS = "blocks"
 CHAIN_DEF = "chain_definition"
@@ -46,7 +46,7 @@ class ParseRuleChainsConfig(object):
     @classmethod
     def parse_groups(cls, groups_json_data, frontend=None):
         groups = {}
-        for name, group_json in groups_json_data.items():
+        for name, group_json in list(groups_json_data.items()):
             groups[name] = group_json
         return groups
 
@@ -54,7 +54,7 @@ class ParseRuleChainsConfig(object):
     def parse_blocks(cls, blocks_json_data, frontend=None):
         blocks_objs = {}
         # print ("Blocks JSON: %s" % blocks_json_data)
-        for name, blocks_json in blocks_json_data.items():
+        for name, blocks_json in list(blocks_json_data.items()):
             blocks_objs[name] = Block.from_json(blocks_json)
         return blocks_objs
 
@@ -62,7 +62,7 @@ class ParseRuleChainsConfig(object):
     def parse_chains(cls, chains_json_data, block_objs={}):
         chains_objs = {}
         # print ("Chains JSON: %s" % chains_json_data)
-        for name, chains_json in chains_json_data.items():
+        for name, chains_json in list(chains_json_data.items()):
             chains_objs[name] = Chain.from_json(chains_json,
                                                 block_objs=block_objs)
         return chains_objs
@@ -72,7 +72,7 @@ class ParseRuleChainsConfig(object):
                                 chain_objs={}, block_objs={}):
         chain_defs = {}
         # print ("Chain definitions JSON: %s" % chain_defs_json_data)
-        for name, chains_json in chain_defs_json_data.items():
+        for name, chains_json in list(chain_defs_json_data.items()):
             chain_defs[name] = ChainDefinition.from_json(chains_json,
                                                          chain_objs=chain_objs,
                                                          block_objs=block_objs)
@@ -83,7 +83,7 @@ class ParseRuleChainsConfig(object):
                                     chain_objs, block_objs):
         chain_dispatch_tables = {}
         # print dispatch_json_data
-        for name, dispatch_table_json in dispatch_json_data.items():
+        for name, dispatch_table_json in list(dispatch_json_data.items()):
             cdt = ChainDispatch.from_json(dispatch_table_json, chains=chain_objs)
             chain_dispatch_tables[name] = cdt
         return chain_dispatch_tables

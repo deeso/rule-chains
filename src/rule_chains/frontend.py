@@ -1,5 +1,5 @@
 import pygrok
-from parse import ParseRuleChainsConfig
+from .parse import ParseRuleChainsConfig
 
 
 class BaseFrontend(object):
@@ -133,12 +133,12 @@ class GrokFrontend(BaseFrontend):
         return pattern_name in self.gr.predefined_patterns
 
     def add_chain_definitions(self, chain_defs_objs):
-        for name, chain_definition in chain_defs_objs.items():
+        for name, chain_definition in list(chain_defs_objs.items()):
             self.chain_definitions[name] = chain_definition
 
     def add_groups(self, groups_data):
         s = "Unable to load %s, no corresponding regular expression"
-        for name, pattern_names in groups_data.items():
+        for name, pattern_names in list(groups_data.items()):
             self.grok_groups[name] = []
             for pattern_name in pattern_names:
                 grok = self.load_grok_by_pattern_name(pattern_name)
@@ -148,17 +148,17 @@ class GrokFrontend(BaseFrontend):
                 self.grok_groups[name].append(pattern_name)
 
     def add_chains(self, chain_objs={}):
-        for name, chain in chain_objs.items():
+        for name, chain in list(chain_objs.items()):
             # chain.update_frontend(self)
             self.chains[name] = chain
 
     def add_blocks(self, block_objs):
-        for name, block in block_objs.items():
+        for name, block in list(block_objs.items()):
             block.update_frontend(self)
             self.blocks[name] = block
 
     def add_chain_dispatch_tables(self, dispatch_tables):
-        for name, dispatch_table in dispatch_tables.items():
+        for name, dispatch_table in list(dispatch_tables.items()):
             dispatch_table.update_frontend(self)
             self.dispatch_tables[name] = dispatch_table
 
@@ -217,7 +217,7 @@ class GrokFrontend(BaseFrontend):
         results = {'outcome': False,
                    'rule_results': None,
                    'rule_name': None}
-        for grok_name, grok in self.groks.items():
+        for grok_name, grok in list(self.groks.items()):
             v = grok.match(string)
             if v is not None and len(v) > 0:
                 results['rule_name'] = grok_name
@@ -275,7 +275,7 @@ class GrokFrontend(BaseFrontend):
 
     def match_runall_patterns(self, string, ignore_empty=True):
         all_results = {}
-        for pattern_name in self.groks.keys():
+        for pattern_name in list(self.groks.keys()):
             results = self.match_pattern(pattern_name, string)
             if ignore_empty and results['outcome'] is False:
                 continue

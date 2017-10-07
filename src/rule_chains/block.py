@@ -104,7 +104,7 @@ class Block(object):
             # compile script to usable code
             try:
                 co = compile(cvalue, '<string>', 'exec')
-            except Exception, e:
+            except Exception as e:
                 raise Exception(cls.CO_CREATE_FAILED % (cf_name, str(e)))
 
             # eval the code to get it in the environment
