@@ -18,7 +18,7 @@ SOCK_TYPE [a-zA-Z0-9]+
 STYPE %{SOCK_TYPE:sock_type}
 IP4_NET %{IPV4:ip4_network}
 DHCPD_LISTENING Listening
-DHCPD_LISTENING Sending
+DHCPD_SENDING Sending
 MAC_ADDR %{COMMONMAC:mac_addr}
 NIC_NAME %{NICNAME:nic_name}
 VLAN %{POSINT:vlan}
@@ -31,6 +31,3 @@ DUP duplicate
 DUP_MTYPE %{DUP:lease_type}
 
 DHCPD_DUP_LEASE_MSG uid lease %{IP4_ASMNT} for client %{MAC_SRC} is %{DUP_MTYPE} on %{IP4_NET}/%{NET_MASK}
-
-(\.%{VLAN_SRC})?\/%{MAC_ADDR}\/%{MAC_SRC}\/%{IP4_NET}
-
