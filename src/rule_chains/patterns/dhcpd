@@ -1,0 +1,36 @@
+NICNAME [a-zA-Z0-9_-]+
+NIC_SRC %{NICNAME:nic_src}
+VLAN_SRC %{POSINT:vlan_src}
+MAC_SRC %{COMMONMAC:mac_src}
+IP4_ASMNT %{IPV4:ip4_assignment}
+IP4_UNKN %{IPV4:ip4_unknown}
+DHCPOFFER DHCPOFFER
+DHCPACK DHCPACK
+DHCPDISCOVER DHCPDISCOVER
+DHCPREQUEST DHCPREQUEST
+
+DHCPOFFER_MSG %{DHCPOFFER:dhcp_msg_type} on %{IP4_ASMNT} to %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
+DHCPACK_MSG %{DHCPACK:dhcp_msg_type} on %{IP4_ASMNT} to %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
+DHCPDISCOVER_MSG %{DHCPDISCOVER:dhcp_msg_type} from %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
+DHCPREQUEST_MSG %{DHCPREQUEST:dhcp_msg_type} for %{IP4_ASMNT} from %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?(: unknown lease %{IP4_UNKN}})?
+
+SOCK_TYPE [a-zA-Z0-9]+
+STYPE %{SOCK_TYPE:sock_type}
+IP4_NET %{IPV4:ip4_network}
+DHCPD_LISTENING Listening
+DHCPD_LISTENING Sending
+MAC_ADDR %{COMMONMAC:mac_addr}
+NIC_NAME %{NICNAME:nic_name}
+VLAN %{POSINT:vlan}
+NET_MASK %{POSINT:netmask}
+DHCPD_LISTEN_MSG %{DHCPD_LISTENING:dhcpd_status} on %{STYPE}\/%{NIC_NAME}(\.%{VLAN})?\/%{MAC_ADDR}\/%{IP4_NET}\/%{NET_MASK}
+
+DHCPD_SENDING_MSG %{DHCPD_SENDING:dhcpd_status} on   %{STYPE}\/%{NIC_NAME}(\.%{VLAN})?\/%{MAC_ADDR}\/%{IP4_NET}\/%{NET_MASK}
+
+DUP duplicate
+DUP_MTYPE %{DUP:lease_type}
+
+DHCPD_DUP_LEASE_MSG uid lease %{IP4_ASMNT} for client %{MAC_SRC} is %{DUP_MTYPE} on %{IP4_NET}/%{NET_MASK}
+
+(\.%{VLAN_SRC})?\/%{MAC_ADDR}\/%{MAC_SRC}\/%{IP4_NET}
+
