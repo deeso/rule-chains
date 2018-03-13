@@ -12,7 +12,7 @@ DHCPREQUEST DHCPREQUEST
 DHCPOFFER_MSG %{DHCPOFFER:dhcp_msg_type} on %{IP4_ASMNT} to %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
 DHCPACK_MSG %{DHCPACK:dhcp_msg_type} on %{IP4_ASMNT} to %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
 DHCPDISCOVER_MSG %{DHCPDISCOVER:dhcp_msg_type} from %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?
-DHCPREQUEST_MSG %{DHCPREQUEST:dhcp_msg_type} for %{IP4_ASMNT} from %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?(: unknown lease %{IP4_UNKN}})?
+DHCPREQUEST_MSG %{DHCPREQUEST:dhcp_msg_type} for %{IP4_ASMNT} from %{MAC_SRC} via %{NIC_SRC}(\.%{VLAN_SRC})?(: unknown lease %{IP4_UNKN}.)?
 
 SOCK_TYPE [a-zA-Z0-9]+
 STYPE %{SOCK_TYPE:sock_type}
